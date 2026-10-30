@@ -1,0 +1,1084 @@
+{
+  "6377547902": {
+    "level": 71,
+    "attack": 671,
+    "hp": 1500,
+    "max_hp": 1500,
+    "xp": 2275,
+    "coins": 1844,
+    "bought_hp": 2,
+    "bought_atk": 67,
+    "att_day": "2026-10-30",
+    "att_used": 110,
+    "first_seen": 0,
+    "last_seen": 1793373122,
+    "name": "👨🏼‍✈️꧁༒☬☠Đímã☠︎☬༒꧂👨🏼‍✈️",
+    "username": "dimon20641",
+    "wins": 271,
+    "pvp_wins": 60,
+    "pvp_games": 70,
+    "rating": 1381,
+    "tower_best": 155,
+    "boss_kills": 0,
+    "streak": 6,
+    "class": "archer",
+    "clan": "я тут король",
+    "nick": "Дмитрий",
+    "inv": [
+      {
+        "n": "Щит",
+        "s": "armor",
+        "r": 2,
+        "p": 45
+      },
+      {
+        "n": "Талисман",
+        "s": "amulet",
+        "r": 2,
+        "p": 12
+      },
+      {
+        "n": "Латы",
+        "s": "armor",
+        "r": 2,
+        "p": 46
+      },
+      {
+        "n": "Талисман",
+        "s": "amulet",
+        "r": 2,
+        "p": 12
+      },
+      {
+        "n": "Амулет",
+        "s": "amulet",
+        "r": 2,
+        "p": 12
+      },
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 2,
+        "p": 74
+      },
+      {
+        "n": "Меч",
+        "s": "weapon",
+        "r": 2,
+        "p": 75
+      },
+      {
+        "n": "Копьё",
+        "s": "weapon",
+        "r": 2,
+        "p": 76
+      }
+    ],
+    "eq": {
+      "weapon": {
+        "n": "Топор",
+        "s": "weapon",
+        "r": 3,
+        "p": 83
+      },
+      "amulet": {
+        "n": "Амулет",
+        "s": "amulet",
+        "r": 3,
+        "p": 14
+      },
+      "armor": {
+        "n": "Латы",
+        "s": "armor",
+        "r": 3,
+        "p": 69
+      }
+    },
+    "ach": [
+      "lvl_10",
+      "pvp_10",
+      "clan",
+      "tower_10",
+      "legend",
+      "tower_30",
+      "first_win",
+      "wins_10",
+      "camp_1",
+      "camp_all",
+      "farm_1",
+      "lvl_25",
+      "wins_100",
+      "lvl_50"
+    ],
+    "titles": [
+      "Десятка",
+      "Гладиатор",
+      "Соратник",
+      "Покоритель башни",
+      "Счастливчик",
+      "Хозяин башни",
+      "Первая кровь",
+      "Боец",
+      "Охотник",
+      "Герой кампании",
+      "Майнер",
+      "Мастер",
+      "Ветеран",
+      "Легенда"
+    ],
+    "q": {
+      "day": "2026-10-30",
+      "have": {
+        "win": 3,
+        "tower": 3
+      },
+      "done": [
+        "win",
+        "tower"
+      ],
+      "ids": [
+        "tower",
+        "win",
+        "boss"
+      ]
+    },
+    "last_day": "2026-10-30",
+    "pvp_day": "2026-10-30",
+    "pvp_used": 10,
+    "title": "Легенда",
+    "partners": {
+      "1991433077": 1,
+      "7848911933": 3
+    },
+    "nick_ts": 1792951146.7178633,
+    "found_legend": 32,
+    "refs": 4,
+    "luck_until": 1793216483.650127,
+    "energy_n": 137,
+    "energy_day": "2026-10-29",
+    "camp": {
+      "kills": {
+        "forest": 9,
+        "cave": 5,
+        "castle": 174,
+        "swamp": 9,
+        "desert": 9,
+        "ice": 10,
+        "volcano": 15
+      },
+      "done": [
+        "forest",
+        "cave",
+        "castle",
+        "swamp",
+        "desert",
+        "ice",
+        "volcano"
+      ]
+    },
+    "att_extra": 10,
+    "att_extra_day": "2026-10-30",
+    "tr_sent": 500,
+    "tr_day": "2026-10-27",
+    "tr_to": {
+      "7848911933": 1
+    },
+    "farm": {
+      "cards": [
+        5,
+        3,
+        4,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "slots": 20,
+      "lvl": 11,
+      "t": 1793350308.5555234,
+      "stock": 0.4518924524248558
+    },
+    "farm_boost": 1793487749.1336546,
+    "xp_until": 1793258945.9255812,
+    "farm_qty": 1,
+    "inv_extra": 40
+  },
+  "6800688789": {
+    "level": 2,
+    "attack": 10,
+    "hp": 120,
+    "max_hp": 120,
+    "xp": 0,
+    "coins": 10422,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "first_seen": 0,
+    "last_seen": 1793290247,
+    "name": "Дмитрий",
+    "username": "Jokey212",
+    "rating": 901,
+    "pvp_games": 14,
+    "wins": 0,
+    "pvp_wins": 0,
+    "tower_best": 0,
+    "boss_kills": 1,
+    "streak": 2,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {
+      "weapon": {
+        "n": "Топор",
+        "s": "weapon",
+        "r": 3,
+        "p": 9
+      }
+    },
+    "ach": [],
+    "titles": [],
+    "q": {
+      "day": "2026-10-26",
+      "have": {},
+      "done": [],
+      "ids": [
+        "tower",
+        "loot",
+        "win"
+      ]
+    },
+    "last_day": "2026-10-29",
+    "att_day": "2026-10-29",
+    "att_used": 0,
+    "found_legend": 1,
+    "att_extra": 10,
+    "att_extra_day": "2026-10-29",
+    "energy_n": 1,
+    "energy_day": "2026-10-29"
+  },
+  "7848911933": {
+    "level": 27,
+    "attack": 142,
+    "hp": 700,
+    "max_hp": 700,
+    "xp": 595,
+    "coins": 2371,
+    "bought_hp": 8,
+    "bought_atk": 7,
+    "first_seen": 0,
+    "last_seen": 1793351894,
+    "name": "🧑‍✈️#AFK",
+    "username": "Vortex_kz",
+    "rating": 1216,
+    "pvp_games": 55,
+    "wins": 31,
+    "pvp_wins": 35,
+    "tower_best": 54,
+    "boss_kills": 1,
+    "streak": 6,
+    "class": "warrior",
+    "clan": "SOULLESS",
+    "nick": "",
+    "inv": [
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 2,
+        "p": 19
+      },
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 2,
+        "p": 20
+      },
+      {
+        "n": "Щит",
+        "s": "armor",
+        "r": 2,
+        "p": 7
+      },
+      {
+        "n": "Кулон",
+        "s": "amulet",
+        "r": 2,
+        "p": 6
+      },
+      {
+        "n": "Меч",
+        "s": "weapon",
+        "r": 2,
+        "p": 22
+      },
+      {
+        "n": "Топор",
+        "s": "weapon",
+        "r": 3,
+        "p": 25
+      },
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 2,
+        "p": 25
+      },
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 3,
+        "p": 41
+      },
+      {
+        "n": "Щит",
+        "s": "armor",
+        "r": 3,
+        "p": 25
+      },
+      {
+        "n": "Латы",
+        "s": "armor",
+        "r": 2,
+        "p": 11
+      },
+      {
+        "n": "Кинжал",
+        "s": "weapon",
+        "r": 2,
+        "p": 28
+      },
+      {
+        "n": "Меч",
+        "s": "weapon",
+        "r": 2,
+        "p": 28
+      },
+      {
+        "n": "Кольчуга",
+        "s": "armor",
+        "r": 3,
+        "p": 25
+      },
+      {
+        "n": "Доспех",
+        "s": "armor",
+        "r": 0,
+        "p": 6
+      },
+      {
+        "n": "Латы",
+        "s": "armor",
+        "r": 0,
+        "p": 6
+      },
+      {
+        "n": "Копьё",
+        "s": "weapon",
+        "r": 2,
+        "p": 28
+      },
+      {
+        "n": "Боевой топор",
+        "s": "weapon",
+        "r": 2,
+        "p": 28,
+        "c": "warrior"
+      },
+      {
+        "n": "Боевой топор",
+        "s": "weapon",
+        "r": 0,
+        "p": 9,
+        "c": "warrior"
+      },
+      {
+        "n": "Латы",
+        "s": "armor",
+        "r": 0,
+        "p": 6,
+        "c": "warrior"
+      },
+      {
+        "n": "Кольчуга",
+        "s": "armor",
+        "r": 0,
+        "p": 6,
+        "c": "warrior"
+      },
+      {
+        "n": "Боевой топор",
+        "s": "weapon",
+        "r": 0,
+        "p": 10,
+        "c": "warrior"
+      },
+      {
+        "n": "Кулон",
+        "s": "amulet",
+        "r": 2,
+        "p": 7
+      },
+      {
+        "n": "Секира",
+        "s": "weapon",
+        "r": 0,
+        "p": 12,
+        "c": "warrior"
+      }
+    ],
+    "eq": {
+      "amulet": {
+        "n": "Кулон",
+        "s": "amulet",
+        "r": 3,
+        "p": 12
+      },
+      "armor": {
+        "n": "Доспех",
+        "s": "armor",
+        "r": 3,
+        "p": 29
+      },
+      "weapon": {
+        "n": "Копьё",
+        "s": "weapon",
+        "r": 3,
+        "p": 41,
+        "u": 1
+      }
+    },
+    "ach": [
+      "clan",
+      "boss_kill",
+      "tower_10",
+      "lvl_10",
+      "legend",
+      "first_win",
+      "camp_1",
+      "wins_10",
+      "camp_all",
+      "farm_1",
+      "pvp_10",
+      "tower_30",
+      "lvl_25"
+    ],
+    "titles": [
+      "Соратник",
+      "Убийца драконов",
+      "Покоритель башни",
+      "Десятка",
+      "Счастливчик",
+      "Первая кровь",
+      "Охотник",
+      "Боец",
+      "Герой кампании",
+      "Майнер",
+      "Гладиатор",
+      "Хозяин башни",
+      "Мастер"
+    ],
+    "q": {
+      "day": "2026-10-30",
+      "have": {
+        "shop": 1,
+        "pvp": 2
+      },
+      "done": [
+        "shop",
+        "pvp"
+      ],
+      "ids": [
+        "guess",
+        "pvp",
+        "shop"
+      ]
+    },
+    "last_day": "2026-10-30",
+    "title": "Мастер",
+    "att_day": "2026-10-30",
+    "att_used": 110,
+    "energy_n": 21,
+    "energy_day": "2026-10-29",
+    "found_legend": 10,
+    "pvp_day": "2026-10-30",
+    "pvp_used": 10,
+    "partners": {
+      "6377547902": 3
+    },
+    "camp": {
+      "kills": {
+        "forest": 6,
+        "cave": 7,
+        "castle": 5,
+        "swamp": 7
+      },
+      "done": [
+        "forest",
+        "cave",
+        "castle"
+      ]
+    },
+    "farm": {
+      "cards": [
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "slots": 4,
+      "lvl": 1,
+      "t": 1793351875.8687754,
+      "stock": 0.7600027480125336
+    },
+    "att_extra": 10,
+    "att_extra_day": "2026-10-30",
+    "farm_boost": 1793165945.9048755,
+    "xp_until": 1793375755.8289144,
+    "luck_until": 1793375760.8471675,
+    "farm_qty": 1,
+    "nick_ts": 0
+  },
+  "5091657807": {
+    "level": 1,
+    "xp": 15,
+    "attack": 32,
+    "hp": 260,
+    "max_hp": 260,
+    "rating": 898,
+    "pvp_games": 13,
+    "coins": 36,
+    "bought_hp": 8,
+    "bought_atk": 11,
+    "wins": 0,
+    "pvp_wins": 0,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 2,
+    "class": "warrior",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [
+      "farm_1"
+    ],
+    "titles": [
+      "Майнер"
+    ],
+    "q": {
+      "day": "2026-10-25",
+      "have": {
+        "boss": 3
+      },
+      "done": [
+        "boss"
+      ],
+      "ids": [
+        "win",
+        "boss",
+        "tower"
+      ]
+    },
+    "first_seen": 0,
+    "last_seen": 1793295998,
+    "name": "Arsen Gesn🇱🇹",
+    "username": "Arsen_945",
+    "last_day": "2026-10-29",
+    "att_day": "2026-10-29",
+    "att_used": 10,
+    "farm": {
+      "cards": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "slots": 3,
+      "lvl": 0,
+      "t": 1793211897.7723136,
+      "stock": 0.0
+    },
+    "title": "Майнер"
+  },
+  "1991433077": {
+    "level": 30,
+    "xp": 1392,
+    "attack": 1443,
+    "hp": 1100,
+    "max_hp": 1100,
+    "coins": 16649,
+    "bought_hp": 21,
+    "bought_atk": 9,
+    "wins": 293,
+    "pvp_wins": 36,
+    "pvp_games": 65,
+    "rating": 1103,
+    "tower_best": 40,
+    "boss_kills": 0,
+    "streak": 6,
+    "class": "mage",
+    "clan": "HARD_SOREE",
+    "nick": "",
+    "inv": [
+      {
+        "n": "Копьё",
+        "s": "weapon",
+        "r": 2,
+        "p": 35
+      },
+      {
+        "n": "Топор",
+        "s": "weapon",
+        "r": 2,
+        "p": 35
+      },
+      {
+        "n": "Топор",
+        "s": "weapon",
+        "r": 2,
+        "p": 35
+      },
+      {
+        "n": "Доспех",
+        "s": "armor",
+        "r": 2,
+        "p": 22
+      },
+      {
+        "n": "Талисман",
+        "s": "amulet",
+        "r": 3,
+        "p": 12
+      },
+      {
+        "n": "Посох",
+        "s": "weapon",
+        "r": 0,
+        "p": 13,
+        "c": "mage"
+      },
+      {
+        "n": "Мантия",
+        "s": "armor",
+        "r": 0,
+        "p": 8,
+        "c": "mage"
+      },
+      {
+        "n": "Плащ мага",
+        "s": "armor",
+        "r": 0,
+        "p": 8,
+        "c": "mage"
+      }
+    ],
+    "eq": {
+      "weapon": {
+        "n": "Меч",
+        "s": "weapon",
+        "r": 3,
+        "p": 37
+      },
+      "armor": {
+        "n": "Латы",
+        "s": "armor",
+        "r": 3,
+        "p": 32
+      },
+      "amulet": {
+        "n": "Талисман",
+        "s": "amulet",
+        "r": 3,
+        "p": 13
+      }
+    },
+    "ach": [
+      "pvp_10",
+      "first_win",
+      "camp_1",
+      "wins_10",
+      "tower_10",
+      "farm_1",
+      "legend",
+      "lvl_10",
+      "wins_100",
+      "tower_30",
+      "lvl_25",
+      "clan"
+    ],
+    "titles": [
+      "Гладиатор",
+      "Первая кровь",
+      "Охотник",
+      "Боец",
+      "Покоритель башни",
+      "Майнер",
+      "Счастливчик",
+      "Десятка",
+      "Ветеран",
+      "Хозяин башни",
+      "Мастер",
+      "Соратник"
+    ],
+    "q": {
+      "day": "2026-10-30",
+      "have": {
+        "shop": 1,
+        "win": 3
+      },
+      "done": [
+        "shop",
+        "win"
+      ],
+      "ids": [
+        "tower",
+        "shop",
+        "win"
+      ]
+    },
+    "first_seen": 0,
+    "last_seen": 1793358534,
+    "name": "🍁🌧️༺𝕾𝖆𝖘𝖍𝖆༻🍀🍁",
+    "username": "sashaxx4",
+    "last_day": "2026-10-30",
+    "pvp_day": "2026-10-29",
+    "pvp_used": 10,
+    "att_day": "2026-10-30",
+    "att_used": 17,
+    "partners": {
+      "6377547902": 1
+    },
+    "title": "Соратник",
+    "camp": {
+      "kills": {
+        "forest": 10,
+        "cave": 6
+      },
+      "done": [
+        "forest"
+      ]
+    },
+    "farm": {
+      "cards": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "slots": 3,
+      "lvl": 0,
+      "t": 1793357792.2621894,
+      "stock": 2.8651952743530273e-05
+    },
+    "att_extra": 10,
+    "att_extra_day": "2026-10-30",
+    "energy_n": 30,
+    "energy_day": "2026-10-29",
+    "found_legend": 14,
+    "farm_qty": 10,
+    "xp_until": 1793479428.429487,
+    "luck_until": 1793393045.6921854,
+    "farm_boost": 1793393059.7151837
+  },
+  "6097931545": {
+    "level": 1,
+    "attack": 10,
+    "hp": 120,
+    "max_hp": 120,
+    "xp": 0,
+    "coins": 10060,
+    "bought_hp": 1,
+    "bought_atk": 0,
+    "first_seen": 1792921714,
+    "last_seen": 1793218808,
+    "name": "🌌᠌darkness🌌",
+    "username": "luno4ka_2",
+    "rating": 900,
+    "pvp_games": 14,
+    "wins": 0,
+    "pvp_wins": 0,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [],
+    "titles": [],
+    "q": {},
+    "last_day": "2026-10-28",
+    "farm": {
+      "cards": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "slots": 3,
+      "lvl": 0,
+      "t": 1793218130.7042553,
+      "stock": 0.0
+    }
+  },
+  "6257923233": {
+    "level": 2,
+    "attack": 10,
+    "hp": 120,
+    "max_hp": 120,
+    "xp": 0,
+    "coins": 10495,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 12,
+    "rating": 937,
+    "tower_best": 0,
+    "boss_kills": 1,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {
+      "amulet": {
+        "n": "Кулон",
+        "s": "amulet",
+        "r": 0,
+        "p": 2
+      }
+    },
+    "ach": [],
+    "titles": [],
+    "q": {
+      "day": "2026-10-26",
+      "have": {},
+      "done": [],
+      "ids": [
+        "loot",
+        "pvp",
+        "guess"
+      ]
+    },
+    "first_seen": 1792965525,
+    "last_seen": 1793211909,
+    "name": "🕸️чел загадка🕸️",
+    "username": "Ilovesnechka",
+    "last_day": "2026-10-28",
+    "ref_by": 6377547902,
+    "ref_paid": false,
+    "att_day": "2026-10-26",
+    "att_used": 50
+  },
+  "7802286263": {
+    "level": 1,
+    "attack": 10,
+    "hp": 100,
+    "max_hp": 100,
+    "xp": 0,
+    "coins": 10110,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 15,
+    "rating": 899,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [],
+    "titles": [],
+    "q": {},
+    "first_seen": 1792993726,
+    "last_seen": 1792993727,
+    "name": "꧁༺ [̲̅Л]🅴г🅴нд[̲̅a]𝖕ный ༻꧂",
+    "username": "Beggars2618",
+    "last_day": "2026-10-26"
+  },
+  "6355296547": {
+    "level": 1,
+    "attack": 10,
+    "hp": 100,
+    "max_hp": 100,
+    "xp": 0,
+    "coins": 10120,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 8,
+    "rating": 939,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "тестер",
+    "inv": [],
+    "eq": {},
+    "ach": [],
+    "titles": [],
+    "q": {},
+    "first_seen": 1792993760,
+    "last_seen": 1793212319,
+    "name": "Я не скам",
+    "username": "Garantik_0",
+    "last_day": "2026-10-28",
+    "nick_ts": 1793033549.9959211
+  },
+  "8459674826": {
+    "level": 1,
+    "attack": 10,
+    "hp": 100,
+    "max_hp": 100,
+    "xp": 0,
+    "coins": 860,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 14,
+    "rating": 926,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [
+      "farm_1"
+    ],
+    "titles": [
+      "Майнер"
+    ],
+    "q": {},
+    "first_seen": 1792993773,
+    "last_seen": 1793350287,
+    "name": "...",
+    "username": "AFK_0001",
+    "last_day": "2026-10-30",
+    "ref_by": 6377547902,
+    "ref_paid": false,
+    "farm": {
+      "cards": [
+        4,
+        1,
+        1,
+        0,
+        0
+      ],
+      "slots": 6,
+      "lvl": 0,
+      "t": 1793215859.0087132,
+      "stock": 0.09177606383959452
+    },
+    "title": "Майнер"
+  },
+  "8459844207": {
+    "level": 1,
+    "attack": 10,
+    "hp": 100,
+    "max_hp": 100,
+    "xp": 0,
+    "coins": 550,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 16,
+    "rating": 917,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [
+      "farm_1"
+    ],
+    "titles": [
+      "Майнер"
+    ],
+    "q": {},
+    "first_seen": 1792993843,
+    "last_seen": 1793218679,
+    "name": "︎ ︎ ︎ ︎ ",
+    "username": "HonoredSatoru1",
+    "last_day": "2026-10-28",
+    "ref_by": 6377547902,
+    "ref_paid": false,
+    "farm": {
+      "cards": [
+        1,
+        4,
+        0,
+        0,
+        0
+      ],
+      "slots": 5,
+      "lvl": 2,
+      "t": 1793218676.291199,
+      "stock": 0.26957633626461025
+    },
+    "title": "Майнер"
+  },
+  "6728011721": {
+    "level": 1,
+    "attack": 10,
+    "hp": 100,
+    "max_hp": 100,
+    "xp": 0,
+    "coins": 10060,
+    "bought_hp": 0,
+    "bought_atk": 0,
+    "wins": 0,
+    "pvp_wins": 0,
+    "pvp_games": 4,
+    "rating": 983,
+    "tower_best": 0,
+    "boss_kills": 0,
+    "streak": 1,
+    "class": "",
+    "clan": "",
+    "nick": "",
+    "inv": [],
+    "eq": {},
+    "ach": [],
+    "titles": [],
+    "q": {},
+    "first_seen": 1793197104,
+    "last_seen": 1793197104,
+    "name": "Vlad glava",
+    "username": "vladislavglava",
+    "last_day": "2026-10-28",
+    "ref_by": 6377547902,
+    "ref_paid": false
+  }
+}
