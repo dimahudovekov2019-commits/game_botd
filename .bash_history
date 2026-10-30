@@ -40,3 +40,13 @@ python3 game_bot.py
 export TELEGRAM_BOT_TOKEN=8815474057:AAFLmuxbifmi41WVhjP68dqOKitDFnQ1Qv8
 export ADMIN_ID=6377547902
 python3 game_bot.py
+less game_bot.py
+cat game_bot.py
+pwd
+ls -F
+export TELEGRAM_BOT_TOKEN=8815474057:AAFLmuxbifmi41WVhjP68dqOKitDFnQ1Qv8
+export ADMIN_ID=6377547902
+python3 game_bot.py
+clear
+echo Hello
+find . -name ".env"

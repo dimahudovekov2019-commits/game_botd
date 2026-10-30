@@ -8,6 +8,7 @@ import sys
 import time
 import re
 import difflib
+import atexit
 from copy import deepcopy
 from telegram import (Update, ReplyKeyboardMarkup, BotCommand, BotCommandScopeChat,
                       InlineKeyboardButton, InlineKeyboardMarkup)
@@ -189,6 +190,7 @@ B_FARM = "🌾 Ферма"
 B_BUY_BOOST = "🚀 Разгон фермы"
 B_HERO = "🎒 Герой"
 B_UP_W, B_UP_A, B_UP_M, B_BUY_BAG = "🔨 Оружие", "🔨 Броня", "🔨 Амулет", "🎒 Рюкзак"
+B_DISM, B_FORGE = "♻️ Разобрать хлам", "🔨 Ковка"
 
 MAIN_KB = ReplyKeyboardMarkup([
     [B_ZONE, B_FARM], [B_GUESS, B_TOD], [B_HERO, B_SHOP], [B_RATING, B_BAL], [B_HELP]], resize_keyboard=True)
@@ -203,7 +205,7 @@ ZONE_KB = ReplyKeyboardMarkup([[B_DUEL, B_CREATURE], [B_CAMP, B_TOWER], [B_PVP, 
 BACK_KB = ReplyKeyboardMarkup([[B_BACK]], resize_keyboard=True)
 BOSS_KB = ReplyKeyboardMarkup([[B_HIT], [B_REFRESH, B_BACK]], resize_keyboard=True)
 PVP_KB = ReplyKeyboardMarkup([[B_FIND], [B_RATING, B_BACK]], resize_keyboard=True)
-INV_KB = ReplyKeyboardMarkup([[B_EQUIP, B_JUNK], [B_BACK]], resize_keyboard=True)
+INV_KB = ReplyKeyboardMarkup([[B_EQUIP, B_JUNK], [B_DISM, B_FORGE], [B_BACK]], resize_keyboard=True)
 CLASS_KB = ReplyKeyboardMarkup([[B_WARRIOR, B_MAGE, B_ARCHER], [B_BACK]], resize_keyboard=True)
 CLAN_KB = ReplyKeyboardMarkup([[B_CLANTOP, B_CLANLEAVE], [B_BACK]], resize_keyboard=True)
 SCREEN_KB = {"boss": BOSS_KB, "pvp": PVP_KB, "inv": INV_KB, "class": CLASS_KB, "clan": CLAN_KB,
@@ -331,9 +333,6 @@ GEAR_SLOT_OF = {"up_weapon": "weapon", "up_armor": "armor", "up_amulet": "amulet
 
 def bag_price(d: dict) -> int:
     return 10000 + 3000 * (d.get("inv_extra", 0) // INV_STEP)   # от 10000 €, каждое расширение дороже
-
-def energy_price(d: dict) -> int:
-    return SHOP_FLAT["energy"]
 
 def upgrade_price(d: dict, slot: str) -> int:
     it = d.get("eq", {}).get(slot)
@@ -782,9 +781,9 @@ RARITY = [("⚪", "Обычный", 1.0), ("🔵", "Редкий", 1.8), ("🟣"
 RARITY_KEY = ["common", "rare", "epic", "legendary"]
 SELL_PRICE = [5, 15, 50, 200]
 CLASSES = {
-    "warrior": ("🛡 Воин", "получает на 15% меньше урона, навык «Мощный удар» ×1.8"),
-    "mage": ("🔮 Маг", "навык «Огненный шар» наносит ×2.6 урона"),
-    "archer": ("🏹 Лучник", "25% шанс критического удара ×2, навык «Град стрел» (3 выстрела)"),
+    "warrior": ("🛡 Воин", "получает на 15% меньше урона, навык «Мощный удар» ×1.8; своя броня на 25% сильнее"),
+    "mage": ("🔮 Маг", "навык «Огненный шар» наносит ×2.6 урона; своё оружие на 20% сильнее"),
+    "archer": ("🏹 Лучник", "25% шанс критического удара ×2, навык «Град стрел» (3 выстрела); свои амулеты на 25% сильнее"),
 }
 SKILLS = {"": ("Сильный удар", 1.6), "warrior": ("Мощный удар", 1.8), "mage": ("Огненный шар", 2.6), "archer": ("Град стрел", 0.9)}
 QUEST_POOL = [
@@ -952,8 +951,11 @@ def gear_ok(it: dict, data: dict) -> bool:
     """Предмет без класса подходит всем, предмет класса только бойцу этого класса."""
     return not it.get("c") or it["c"] == data.get("class", "")
 
+CLASS_GEAR_MULT = {"warrior": {"armor": 1.25}, "mage": {"weapon": 1.20}, "archer": {"amulet": 1.25, "weapon": 1.05}}
+
 def gear_factor(it: dict) -> float:
-    return 1 + 0.08 * it.get("u", 0)   # каждый уровень прокачки: +8% к силе предмета (до +80%)
+    """Сила предмета: +8% за каждый уровень закалки и бонус класса за своё «родное» снаряжение."""
+    return (1 + 0.08 * it.get("u", 0)) * CLASS_GEAR_MULT.get(it.get("c", ""), {}).get(it["s"], 1.0)
 
 def gear_name(slot: str, cls: str) -> str:
     return random.choice(GEAR_NAMES.get(cls, GEAR_NAMES[""])[slot])
@@ -1019,7 +1021,9 @@ def loot_reward(data: dict, boost=0):
 def inv_text(data: dict) -> str:
     a, d, c = equip_bonus(data)
     eq = data.get("eq", {})
-    lines = ["🎒 Инвентарь", f"Бонусы: ⚔️ +{a} к атаке · 🛡 −{d} урона и −{int(armor_pct(data) * 100)}% урона · 📿 +{c}% € и +{c // 2}% XP", "", "Надето:"]
+    cls = CLASSES.get(data.get("class", ""))
+    lines = [f"🎒 Инвентарь · {cls[0] if cls else 'класс не выбран'} · 🔩 осколков: {data.get('shards', 0)}",
+             f"Бонусы: ⚔️ +{a} к атаке · 🛡 −{d} урона и −{int(armor_pct(data) * 100)}% урона · 📿 +{c}% € и +{c // 2}% XP", "", "Надето:"]
     for slot in SLOTS:
         lines.append("  " + (item_line(eq[slot]) if slot in eq else f"{SLOTS[slot][0]} — пусто"))
     inv = data.get("inv", [])
@@ -1027,7 +1031,12 @@ def inv_text(data: dict) -> str:
     lines += [f"{i}. {'🚫 ' if not gear_ok(it, data) else ''}{item_line(it)}" for i, it in enumerate(inv[:15], 1)] or ["  пусто"]
     if len(inv) > 15:
         lines.append(f"…и ещё {len(inv) - 15}")
-    lines.append("\nКоманды: «надеть N», «продать N», «выбросить N» (номер из списка). Продажа и выброс спрашивают подтверждение.")
+    if any(not gear_ok(it, data) for it in inv):
+        lines.append("🚫 — снаряжение другого класса, надеть его нельзя")
+    if not cls:
+        lines.append("\n💡 Выбери класс: «🎒 Герой» → «🧙 Класс». От него зависит, какое снаряжение тебе подходит.")
+    lines.append("\nКоманды: «надеть N», «продать N», «выбросить N». Продажа и выброс спрашивают подтверждение.\n"
+                 "🔨 Ковка: снаряжение и закалка за осколки. ♻️ Разбор хлама даёт осколки.")
     return "\n".join(lines)
 
 def equip_best(data: dict) -> int:
@@ -1414,7 +1423,7 @@ def make_enemy(floor: int) -> dict:
 def tower_game(data: dict, floor: int) -> dict:
     e = make_enemy(floor)
     return {"game": "duel", "mode": "tower", "floor": floor, "player_hp": data["hp"], "bot_hp": e["hp"],
-            "bot_attack": e["attack"], "round": 1, "opponent": e["name"], "cd": 0}
+            "bot_attack": e["attack"], "round": 1, "opponent": e["name"], "cd": 0, "boss": floor % 10 == 0}
 
 async def start_tower(update: Update, user_id: int, data: dict):
     if user_id in active_games and active_games[user_id].get("game") == "duel":
@@ -1443,6 +1452,7 @@ async def fight_action(update: Update, context: ContextTypes.DEFAULT_TYPE, user_
         await reply(update, f"⚡ Лимит атак на сегодня исчерпан ({attacks_used(data)}/{attack_limit(data)}). "
                             "Выйти из боя: «🏃 Уйти». Лимит можно расширить в магазине: ⚡ Энергетик.")
         return
+    game.setdefault("bot_max", game["bot_hp"])
     data["att_used"] = attacks_used(data) + 1
     opp = game["opponent"]
     defending = False
@@ -1475,7 +1485,16 @@ async def fight_action(update: Update, context: ContextTypes.DEFAULT_TYPE, user_
     if game["bot_hp"] <= 0:
         await fight_win(update, context, user_id, data, game, log)
         return
+    boss = bool(game.get("boss"))
+    game["turn"] = game.get("turn", 0) + 1
+    if boss and not game.get("rage") and game["bot_hp"] * 2 < game["bot_max"]:
+        game["rage"] = True
+        game["bot_attack"] = int(game["bot_attack"] * 1.25)
+        log += f"🔥 {opp} впадает в ярость!\n"
     d_in = random.randint(max(1, game["bot_attack"] - 5), game["bot_attack"] + 5)
+    if boss and game["turn"] % 4 == 0:
+        d_in = int(d_in * 1.8)
+        log += f"💥 {opp} бьёт мощным ударом!\n"
     d_in = max(1, d_in - dfn)
     d_in = max(1, int(d_in * (1 - armor_pct(data))))   # броня гасит часть каждого удара
     if cls == "warrior":
@@ -1485,6 +1504,8 @@ async def fight_action(update: Update, context: ContextTypes.DEFAULT_TYPE, user_
     game["player_hp"] -= d_in
     data["hp"] = max(0, game["player_hp"])
     log += f"🤖 {opp} нанёс {d_in} урона.\n"
+    if boss and game["turn"] % 4 == 3:
+        log += f"⚠️ {opp} готовит мощный удар: прикройся защитой!\n"
     update_user_data(user_id, data)
     if game["player_hp"] <= 0:
         del active_games[user_id]
@@ -1510,6 +1531,8 @@ async def fight_win(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id:
         xp_gain = (10 + floor * 2) * mult
         coin_gain = int((5 + floor * 2) * mult * (1 + amulet / 100))
         data["coins"] += coin_gain
+        shards = (1 + floor // 5) * mult
+        data["shards"] = data.get("shards", 0) + shards
         levels = add_xp(data, xp_gain)
         data["tower_best"] = max(data.get("tower_best", 0), floor)
         data["hp"] = data["max_hp"] if levels else min(data["max_hp"], game["player_hp"] + data["max_hp"] // 5)
@@ -1518,7 +1541,7 @@ async def fight_win(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id:
         clan_points(data, 1)
         notes += check_ach(data)
         update_user_data(user_id, data)
-        head = f"{log}🗼 Этаж {floor} пройден! +{xp_gain} XP, +{coin_gain} €\n{xp_status(data, levels)}{notes}"
+        head = f"{log}🗼 Этаж {floor} пройден! +{xp_gain} XP, +{coin_gain} €, +{shards} 🔩\n{xp_status(data, levels)}{notes}"
         if attacks_used(data) >= attack_limit(data):
             active_games.pop(user_id, None)
             text = head + f"\n\n⚡ Лимит атак на сегодня исчерпан: забег завершён на этаже {floor}. Рекорд: {data['tower_best']}. /menu."
@@ -1529,21 +1552,27 @@ async def fight_win(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id:
             text = head + f"\n\n🗼 Этаж {floor + 1}: {nxt['opponent']} (HP {nxt['bot_hp']})\nВыбирай действие."
             pic = "tower_boss" if (floor + 1) % 10 == 0 else "tower"
     else:
-        boss = game["opponent"] == "Босс"
-        xp_gain, coin_gain = (60, 30) if boss else (40, 20)
+        boss = bool(game.get("boss"))
+        tier = game.get("tier", 0)
+        mult = (1.0, 1.6, 2.5)[tier]
+        xp_gain, coin_gain = (60, 30) if boss else (int(40 * mult), int(20 * mult))
         coin_gain = int(coin_gain * (1 + amulet / 100))
-        data["attack"] += 5
+        shards = random.randint(8, 12) if boss else random.randint(2, 4) + tier * 3
+        power = 5 if boss else (2, 3, 5)[tier]
+        data["attack"] += power
         data["hp"] = data["max_hp"]
         data["coins"] += coin_gain
+        data["shards"] = data.get("shards", 0) + shards
         data["wins"] = data.get("wins", 0) + 1
         levels = add_xp(data, xp_gain)
-        loot = loot_reward(data, boost=2 if boss else 0)
+        loot = loot_reward(data, boost=2 if boss else tier)
         notes = quest_event(data, "win") + (quest_event(data, "loot") if loot else "")
         clan_points(data, 1)
         notes += check_ach(data)
         del active_games[user_id]
         update_user_data(user_id, data)
-        text = f"{log}🎉 Победа! Заработано {xp_gain} XP, {coin_gain} € и +5 к атаке. HP восстановлено.\n{xp_status(data, levels)}{notes}"
+        text = (f"{log}🎉 Победа! +{xp_gain} XP, +{coin_gain} €, +{shards} 🔩 осколков и +{power} к атаке. HP восстановлено.\n"
+                f"{xp_status(data, levels)}{notes}")
         pic = "win"
     await reply_pic(update, pic, text)
     if loot:
@@ -1591,7 +1620,7 @@ def screen_content(kind: str, user_id: int, data: dict):
 async def open_screen(update: Update, kind: str, user_id: int, data: dict):
     st = {"game": "screen", "kind": kind, "page": 0}
     cur = active_games.get(f"scr_{user_id}")
-    if cur and cur.get("kind") in ("redzone", "farm", "hero") and kind != cur.get("kind"):
+    if cur and cur.get("kind") in ("redzone", "farm", "hero", "inv") and kind != cur.get("kind"):
         st["parent"] = cur["kind"]   # «Назад» вернёт в предыдущий раздел
     active_games[f"scr_{user_id}"] = st
     pic, text = screen_content(kind, user_id, data)
@@ -1632,7 +1661,14 @@ async def screens_dispatch(update: Update, context: ContextTypes.DEFAULT_TYPE, u
         if text == "надеть лучшее":
             n = equip_best(data)
             update_user_data(user_id, data)
-            await reply_pic(update, "inventory", (f"✅ Улучшено слотов: {n}\n\n" if n else "ℹ️ Лучше уже ничего нет.\n\n") + inv_text(data))
+            skipped = sum(1 for it in data.get("inv", []) if not gear_ok(it, data))
+            note = f"🚫 Снаряжение другого класса пропущено: {skipped}\n" if skipped else ""
+            await reply_pic(update, "inventory", (f"✅ Улучшено слотов: {n}\n" if n else "ℹ️ Лучше ничего нет.\n") + note + "\n" + inv_text(data))
+            return True
+        if text == "разобрать хлам":
+            n, total = dismantle_junk(data)
+            update_user_data(user_id, data)
+            await reply_pic(update, "inventory", f"♻️ Разобрано предметов: {n}, получено {total} осколков (эпические и легендарные остались)\n\n{inv_text(data)}")
             return True
         if text == "продать хлам":
             n, total = sell_junk(data)
@@ -1882,11 +1918,6 @@ def attack_limit(data: dict) -> int:
     extra = data.get("att_extra", 0) if data.get("att_extra_day") == today_s() else 0
     return DAILY_ATTACKS + extra
 
-def loot_force(data: dict, boost=0, min_r=0, title="🎁 Добыча!"):
-    it = roll_loot(data, boost=boost, force=True, min_r=min_r)
-    how = add_item(data, it)
-    return f"loot_{RARITY_KEY[it['r']]}", f"{title}\n{item_line(it)}\n→ {how}"
-
 ACH["camp_1"] = ("Охотник", "Пройди Тёмный лес", lambda d: "forest" in d.get("camp", {}).get("done", []), 100)
 ACH["camp_all"] = ("Герой кампании", "Пройди все локации кампании", lambda d: len(d.get("camp", {}).get("done", [])) >= len(LOCS), 400)
 ACH["farm_1"] = ("Майнер", "Купи первую видеокарту", lambda d: sum((d.get("farm") or {}).get("cards", [])) >= 1, 80)
@@ -1988,6 +2019,8 @@ async def camp_win(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: 
     xp_gain = int(30 * mult)
     coin_gain = int(15 * mult * (1 + equip_bonus(data)[2] / 100))
     data["coins"] += coin_gain
+    shards = random.randint(15, 25) + 2 * i if boss else random.randint(2, 5) + i // 2
+    data["shards"] = data.get("shards", 0) + shards
     data["wins"] = data.get("wins", 0) + 1
     data["hp"] = min(data["max_hp"], game["player_hp"] + data["max_hp"] // 4)
     levels = add_xp(data, xp_gain)
@@ -2018,7 +2051,7 @@ async def camp_win(update: Update, context: ContextTypes.DEFAULT_TYPE, user_id: 
     notes += check_ach(data)
     del active_games[user_id]
     update_user_data(user_id, data)
-    await reply_pic(update, "win", f"{log}🎉 Победа! +{xp_gain} XP, +{coin_gain} €.\n{xp_status(data, levels)}{notes}{story}")
+    await reply_pic(update, "win", f"{log}🎉 Победа! +{xp_gain} XP, +{coin_gain} €, +{shards} 🔩.\n{xp_status(data, levels)}{notes}{story}")
     if loot:
         await reply_pic(update, loot[0], loot[1])
 
@@ -2492,14 +2525,17 @@ async def act_inv(update, context, user_id, data, text, orig) -> bool:
         st["confirm"] = {"cmd": text}
         await reply(update, f"❓ {ask}")
         return True
-    if text == "продать хлам":
+    if text in ("продать хлам", "разобрать хлам"):
         junk = [it for it in inv if it["r"] <= 1]
         if not junk:
             await reply(update, "ℹ️ Хлама нет: обычные и редкие предметы в рюкзаке закончились.")
             return True
         st["confirm"] = {"cmd": text}
-        await reply(update, f"❓ Продать {len(junk)} предметов (обычные и редкие) за {sum(sell_price(it, data) for it in junk)} €? "
-                            "Эпические и легендарные останутся.")
+        if text == "продать хлам":
+            ask = f"Продать {len(junk)} предметов (обычные и редкие) за {sum(sell_price(it, data) for it in junk)} €?"
+        else:
+            ask = f"Разобрать {len(junk)} предметов (обычные и редкие) на {sum(DISMANTLE[it['r']] for it in junk)} осколков?"
+        await reply(update, f"❓ {ask} Эпические и легендарные останутся.")
         return True
     return False
 
@@ -2744,7 +2780,7 @@ async def admin_extra(data: str, update: Update, context: ContextTypes.DEFAULT_T
         state = "повержен" if b.get("dead") else f"HP {b.get('hp', 0)}/{b.get('max', 0)}"
         return (f"🐉 Запустить мирового босса сейчас?\n\nСейчас: «{b.get('name', '—')}» ({state}).\n"
                 "Текущий босс будет заменён, тем, кто его бил, начислится утешительная награда, а все игроки получат уведомление.\n\n"
-                "Свои название и HP: /spawnboss Название 5кк", BOSS_KB)
+                "Свои название и HP: /spawnboss Название 5кк", BOSS_SPAWN_KB)
     if data == "adm_boss_no":
         return ("❌ Запуск босса отменён.", BACK_ADM_KB)
     if data == "adm_boss_yes":
@@ -2803,9 +2839,227 @@ async def spawnboss_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"✅ Мировой босс «{b['name']}» запущен: HP {b['max']}. Уведомлено игроков: {sent}.")
 
 ACH["abyss_50"] = ("Хозяин бездны", "Достигни глубины 50 в Бездне", lambda d: d.get("camp", {}).get("kills", {}).get("abyss", 0) >= 50, 500)
-BOSS_KB = InlineKeyboardMarkup([[InlineKeyboardButton("✅ Запустить", callback_data="adm_boss_yes"),
+BOSS_SPAWN_KB = InlineKeyboardMarkup([[InlineKeyboardButton("✅ Запустить", callback_data="adm_boss_yes"),
                                  InlineKeyboardButton("❌ Отмена", callback_data="adm_boss_no")]])
 
+
+# =====================================================================
+#   ОБНОВЛЕНИЕ 19: дуэль с боссом и охота на существ, осколки и ковка, защита от двойного запуска
+# =====================================================================
+PID_FILE = "game_bot.pid"
+BOSS_TITLES = ["Костяной король", "Тёмный страж", "Повелитель клинков", "Хозяин подземелий", "Теневой палач"]
+HUNT_TIERS = [("⚪ Обычное", 1.0, 70), ("🔵 Редкое", 1.6, 25), ("🟣 Элитное", 2.5, 5)]   # название, сила, шанс в %
+FORGE_COST = [40, 150, 500]                      # осколков за предмет: обычный, редкий, эпический
+TEMPER_COST = [30, 45, 70, 100, 150, 220, 320, 450, 650, 900]   # осколков за закалку с уровня u до u+1
+DISMANTLE = [3, 10, 35, 100]                     # осколков за разбор предмета по редкости
+B_FT = ["⚪ Ковка: обычный", "🔵 Ковка: редкий", "🟣 Ковка: эпический"]
+B_FORGE_CRAFT = ["⚒ Ковать оружие", "⚒ Ковать броню", "⚒ Ковать амулет"]
+B_FORGE_TEMPER = ["🔥 Закалить оружие", "🔥 Закалить броню", "🔥 Закалить амулет"]
+FORGE_KB = ReplyKeyboardMarkup([B_FT, B_FORGE_CRAFT, B_FORGE_TEMPER, [B_BACK]], resize_keyboard=True)
+SCREEN_KB["forge"] = FORGE_KB
+SCREEN_WORDS["ковка"] = "forge"
+BUTTON_ALIASES.update({_norm(k): v for k, v in {
+    B_FORGE: "ковка", B_DISM: "разобрать хлам",
+    **{B_FT[i]: f"ковка уровень {i + 1}" for i in range(3)},
+    **{B_FORGE_CRAFT[i]: f"ковать {w}" for i, w in enumerate(("оружие", "броню", "амулет"))},
+    **{B_FORGE_TEMPER[i]: f"закалить {w}" for i, w in enumerate(("оружие", "броню", "амулет"))},
+}.items()})
+FORGE_SLOTS = {"оружие": "weapon", "броню": "armor", "амулет": "amulet"}
+
+
+# ---------------- защита от двойного запуска ----------------
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+
+def find_other_instances() -> list:
+    """Другие запущенные копии этого же файла бота (по списку процессов и по pid-файлу)."""
+    me, parent, script, found = os.getpid(), os.getppid(), os.path.basename(__file__), set()
+    try:
+        for name in os.listdir("/proc"):
+            if not name.isdigit() or int(name) in (me, parent):
+                continue
+            try:
+                with open(f"/proc/{name}/cmdline", "rb") as f:
+                    args = f.read().split(b"\0")
+            except OSError:
+                continue
+            if args and b"python" in os.path.basename(args[0]) and any(os.path.basename(a.decode(errors="ignore")) == script for a in args[1:]):
+                found.add(int(name))
+    except OSError:
+        pass
+    try:
+        with open(PID_FILE) as f:
+            old = int(f.read().strip())
+        if old not in (me, parent) and _alive(old):
+            found.add(old)
+    except (OSError, ValueError):
+        pass
+    return sorted(found)
+
+def ensure_single_instance(wait: float = 20.0) -> int:
+    """Останавливает старые копии бота, чтобы работала ровно одна. Иначе ответы дублируются, а данные затирают друг друга."""
+    others = find_other_instances()
+    for pid in others:
+        try:
+            os.kill(pid, signal.SIGTERM)    # мягко: старая копия успеет сохранить данные
+        except OSError:
+            pass
+    deadline = time.time() + wait
+    while others and time.time() < deadline and any(_alive(p) for p in others):
+        time.sleep(0.3)
+    for pid in others:
+        if _alive(pid):
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError:
+                pass
+    try:
+        with open(PID_FILE, "w") as f:
+            f.write(str(os.getpid()))
+    except OSError:
+        pass
+    atexit.register(lambda: os.path.exists(PID_FILE) and open(PID_FILE).read().strip() == str(os.getpid()) and os.remove(PID_FILE))
+    if others:
+        logger.warning(f"Остановлено старых копий бота: {len(others)} ({', '.join(map(str, others))}). Теперь работает одна.")
+    return len(others)
+
+async def on_error(update, context):
+    try:
+        from telegram.error import Conflict
+        conflict = isinstance(context.error, Conflict)
+    except ImportError:
+        conflict = False
+    if conflict:
+        logger.error("Telegram: с этим токеном уже запущена другая копия бота. Останови лишние: pkill -f game_bot.py, затем запусти бота заново.")
+    else:
+        logger.error("Ошибка в обработчике: %s", context.error, exc_info=context.error)
+
+
+# ---------------- дуэль с боссом и охота на существ ----------------
+async def fight_ready(update: Update, user_id: int, data: dict) -> bool:
+    if user_id in active_games and active_games[user_id].get("game") == "duel":
+        await reply(update, "⚠️ Бой уже идёт.")
+        return False
+    if data["hp"] <= 0:
+        await reply(update, "🩸 У тебя 0 HP. Подожди лечения (+15 HP каждую минуту).")
+        return False
+    if attacks_used(data) >= attack_limit(data):
+        await reply(update, f"⚡ Лимит атак на сегодня исчерпан ({attacks_used(data)}/{attack_limit(data)}). Новые атаки появятся завтра.")
+        return False
+    return True
+
+async def start_boss_duel(update: Update, user_id: int, data: dict):
+    """Дуэль с боссом: ярость на половине HP и мощный удар каждый 4-й ход (его можно переждать защитой)."""
+    if not await fight_ready(update, user_id, data):
+        return
+    title = BOSS_TITLES[int(time.strftime("%j")) % len(BOSS_TITLES)]
+    hp, atk = 120 + data["level"] * 15, 12 + data["level"] * 3
+    active_games[user_id] = {"game": "duel", "mode": "duel", "boss": True, "tier": 0, "player_hp": data["hp"], "bot_hp": hp,
+                             "bot_attack": atk, "round": 1, "opponent": f"Босс «{title}»", "cd": 0}
+    await reply_pic(update, "boss", f"⚔️ ДУЭЛЬ С БОССОМ\n{title}\nТвоё HP: {data['hp']}/{data['max_hp']} · HP босса: {hp} · урон ~{atk}\n"
+                                    "🔥 На половине HP босс впадает в ярость, а каждый 4-й ход бьёт мощным ударом: перед ним прикройся защитой.\n"
+                                    "Награда: больше XP, € и осколков, небольшой шанс на снаряжение.\nВыбирай действие.")
+
+async def start_hunt(update: Update, user_id: int, data: dict):
+    """Охота: существо бывает обычным, редким или элитным. Чем сильнее, тем богаче награда."""
+    if not await fight_ready(update, user_id, data):
+        return
+    tier = random.choices(range(3), weights=[t[2] for t in HUNT_TIERS])[0]
+    name = random.choice(list(CREATURES))
+    c, mult = CREATURES[name], HUNT_TIERS[tier][1]
+    hp, atk = int((c["hp"] + data["level"] * 10) * mult), int((c["attack"] + data["level"] * 2) * mult)
+    active_games[user_id] = {"game": "duel", "mode": "duel", "boss": False, "tier": tier, "player_hp": data["hp"], "bot_hp": hp,
+                             "bot_attack": atk, "round": 1, "opponent": name, "cd": 0}
+    await reply_pic(update, CREATURE_PIC[name], f"👹 ОХОТА: {HUNT_TIERS[tier][0]} существо {name}\nТвоё HP: {data['hp']}/{data['max_hp']} · "
+                                                f"HP врага: {hp} · урон ~{atk}\nВыбирай действие.")
+
+
+# ---------------- осколки и ковка (путь к снаряжению без магазина и без удачи) ----------------
+def dismantle_junk(data: dict):
+    inv = data.setdefault("inv", [])
+    keep, n, total = [], 0, 0
+    for it in inv:
+        if it["r"] <= 1:
+            total += DISMANTLE[it["r"]]
+            n += 1
+        else:
+            keep.append(it)
+    data["inv"] = keep
+    data["shards"] = data.get("shards", 0) + total
+    return n, total
+
+def forge_text(d: dict) -> str:
+    tier = d.get("forge_tier", 0)
+    cls = CLASSES.get(d.get("class", ""), ("не выбран",))[0]
+    lines = [f"🔨 Ковка · 🔩 осколков: {d.get('shards', 0)} · класс: {cls}", "",
+             f"Выбрано: {RARITY[tier][0]} {RARITY[tier][1]} предмет — {FORGE_COST[tier]} осколков",
+             "Куётся снаряжение твоего класса. Легендарное только из добычи и сундуков.", "",
+             f"🔥 Закалка надетого снаряжения (до {GEAR_MAX_LVL} уровня):"]
+    for slot, name in (("weapon", "Оружие"), ("armor", "Броня"), ("amulet", "Амулет")):
+        it = d.get("eq", {}).get(slot)
+        u = it.get("u", 0) if it else 0
+        if not it:
+            lines.append(f"{SLOTS[slot][0]} {name}: слот пуст")
+        elif u >= GEAR_MAX_LVL:
+            lines.append(f"{SLOTS[slot][0]} {name}: максимум ({u}/{GEAR_MAX_LVL})")
+        else:
+            lines.append(f"{SLOTS[slot][0]} {name} {u}→{u + 1}: {TEMPER_COST[u]} осколков")
+    lines += ["", "Осколки падают после боёв (больше с боссов и элитных существ) и выходят из разобранного хлама."]
+    return "\n".join(lines)
+
+SCREEN_RENDER["forge"] = lambda uid, d: ("inventory", forge_text(d))
+
+async def act_forge(update, context, user_id, data, text, orig) -> bool:
+    m = re.fullmatch(r"ковка уровень ([123])", text)
+    if m:
+        data["forge_tier"] = int(m.group(1)) - 1
+        update_user_data(user_id, data)
+        await reply_pic(update, "inventory", forge_text(data))
+        return True
+    m = re.fullmatch(r"ковать (оружие|броню|амулет)", text)
+    if m:
+        slot, tier, cls = FORGE_SLOTS[m.group(1)], data.get("forge_tier", 0), data.get("class", "")
+        cost = FORGE_COST[tier]
+        if not cls:
+            await reply(update, "🚫 Сначала выбери класс: «🎒 Герой» → «🧙 Класс». Куётся снаряжение твоего класса.")
+        elif data.get("shards", 0) < cost:
+            await reply(update, f"❌ Не хватает осколков: нужно {cost}, у тебя {data.get('shards', 0)}.")
+        elif slot in data.get("eq", {}) and len(data.get("inv", [])) >= inv_capacity(data):
+            await reply(update, "❌ Рюкзак полон. Продай или разбери лишнее, либо расширь рюкзак в магазине.")
+        else:
+            data["shards"] -= cost
+            it = {"n": gear_name(slot, cls), "s": slot, "r": tier, "p": calc_power(slot, tier, data["level"]), "c": cls}
+            how = add_item(data, it)
+            update_user_data(user_id, data)
+            await reply_pic(update, f"loot_{RARITY_KEY[tier]}", f"🔨 Выковано!\n{item_line(it)}\n→ {how}\n🔩 Осталось осколков: {data['shards']}")
+        return True
+    m = re.fullmatch(r"закалить (оружие|броню|амулет)", text)
+    if m:
+        it = data.get("eq", {}).get(FORGE_SLOTS[m.group(1)])
+        u = it.get("u", 0) if it else 0
+        if not it:
+            await reply(update, "ℹ️ В этом слоте ничего не надето. Сначала надень предмет.")
+        elif not gear_ok(it, data):
+            await reply(update, gear_mismatch_text(it, data))
+        elif u >= GEAR_MAX_LVL:
+            await reply(update, f"ℹ️ Предмет уже на максимальном уровне ({GEAR_MAX_LVL}/{GEAR_MAX_LVL}).")
+        elif data.get("shards", 0) < TEMPER_COST[u]:
+            await reply(update, f"❌ Не хватает осколков: нужно {TEMPER_COST[u]}, у тебя {data.get('shards', 0)}.")
+        else:
+            data["shards"] -= TEMPER_COST[u]
+            it["u"] = u + 1
+            update_user_data(user_id, data)
+            await reply_pic(update, "inventory", f"🔥 Закалено: {item_line(it)} (уровень {u + 1}/{GEAR_MAX_LVL})\n🔩 Осталось осколков: {data['shards']}")
+        return True
+    return False
+
+ACTS["forge"] = act_forge
 
 async def autosave(context: ContextTypes.DEFAULT_TYPE):
     if dirty:
@@ -2970,13 +3224,14 @@ HELP_TEXTS = {
              "/help_what — что это за бот\n/help_how — как пользоваться\n/help_where — где что искать\n/help_cmds — главные команды"),
     "what": ("🎮 Что это за бот\n\nЭто игра прямо в Telegram. Ты растишь героя: сражаешься с монстрами и боссами, "
              "собираешь снаряжение и зарабатываешь €.\n\nЗа победы растут уровень и опыт. Редкие вещи выпадают иногда: "
-             "это приятная находка, а не награда за каждый бой. Играть можно одному и вместе с друзьями."),
+             "это приятная находка, а не награда за каждый бой. Зато после боёв падают осколки: из них делают снаряжение твоего класса. "
+             "Играть можно одному и вместе с друзьями."),
     "how": ("🧭 Как пользоваться\n\n1. Нажми /start: появится меню с кнопками.\n2. Писать ничего не нужно, управляй кнопками внизу.\n"
             "3. Начни с «🔴 Красная точка» и нажми «Дуэль».\n4. В «🎒 Герой» выбери класс: от него зависит снаряжение.\n"
             "5. € зарабатывай в боях и на «🌾 Ферме», трать в «🛒 Магазине».\n\n"
             "В день можно сделать 100 атак, потом лимит обновится.\n«⬅️ Назад» возвращает на шаг назад, /menu открывает главное меню."),
     "where": ("🔎 Где что искать\n\n⚔️ Бои, кампания, башня, арена, босс — «🔴 Красная точка»\n"
-              "🎒 Инвентарь, класс, задания, клан — «🎒 Герой»\n💶 Покупки и улучшения — «🛒 Магазин»\n"
+              "🎒 Инвентарь, класс, задания, клан — «🎒 Герой»\n🔨 Ковка и закалка за осколки — «🎒 Герой» → «Инвентарь» → «Ковка»\n💶 Покупки и улучшения — «🛒 Магазин»\n"
               "🌾 Пассивный доход — «🌾 Ферма»\n🏆 Места игроков — «🏆 Рейтинг»\n🎁 Приглашения и награды — «🎒 Герой» → «Друзья»\n\n"
               "Не нашёл нужное? Набери / в строке ввода: там все команды."),
     "cmds": ("⌨️ Главные команды\n\n/start — главное меню\n/menu — выйти в меню\n/b — мой баланс\n/shop — магазин\n"
@@ -3070,22 +3325,11 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # --- ТРИГГЕРЫ НАЧАЛА ---
     if text == "дуэль":
-        if user_id in active_games and active_games[user_id].get("game") == "duel": await reply(update, "⚠️ Дуэль идет."); return
-        if data['hp'] <= 0: await reply(update, "🩸 У тебя 0 HP. Подожди лечения (+15 HP каждую минуту)."); return
-        if attacks_used(data) >= attack_limit(data): await reply(update, f"⚡ Лимит атак на сегодня исчерпан ({attack_limit(data)}/{attack_limit(data)}). Новые атаки появятся завтра."); return
-        bot_hp = 120 + (data['level'] * 15); bot_attack = 12 + (data['level'] * 3)
-        active_games[user_id] = {"game": "duel", "player_hp": data['hp'], "bot_hp": bot_hp, "bot_attack": bot_attack, "round": 1, "opponent": "Босс"}
-        await reply_pic(update, "boss", f"⚔️ ДУЭЛЬ: Босс\nHP: {data['hp']}/{data['max_hp']}\nHP Босса: {bot_hp}\nВыбирай действие кнопками.")
+        await start_boss_duel(update, user_id, data)
         return
 
     if text == "существо":
-        if user_id in active_games and active_games[user_id].get("game") == "duel": await reply(update, "⚠️ Дуэль идет."); return
-        if data['hp'] <= 0: await reply(update, "🩸 У тебя 0 HP. Подожди лечения (+15 HP каждую минуту)."); return
-        if attacks_used(data) >= attack_limit(data): await reply(update, f"⚡ Лимит атак на сегодня исчерпан ({attack_limit(data)}/{attack_limit(data)}). Новые атаки появятся завтра."); return
-        creature_name = random.choice(list(CREATURES.keys())); c = CREATURES[creature_name]
-        bot_hp = c["hp"] + (data['level'] * 10); bot_attack = c["attack"] + (data['level'] * 2)
-        active_games[user_id] = {"game": "duel", "player_hp": data['hp'], "bot_hp": bot_hp, "bot_attack": bot_attack, "round": 1, "opponent": creature_name}
-        await reply_pic(update, CREATURE_PIC[creature_name], f"⚔️ ДУЭЛЬ: {creature_name}\nHP: {data['hp']}/{data['max_hp']}\nHP врага: {bot_hp}\nВыбирай действие кнопками.")
+        await start_hunt(update, user_id, data)
         return
 
     if text == "угадай":
@@ -3229,11 +3473,13 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     global user_data
+    ensure_single_instance()   # старые копии бота останавливаются, остаётся одна
     user_data = load_data()
     world.update(load_world())
     for problem in check_menu_sync():
         logger.warning(problem)
     application = Application.builder().token(TOKEN).post_init(on_startup).post_shutdown(on_shutdown).build()
+    application.add_error_handler(on_error)
     
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", menu_command))
